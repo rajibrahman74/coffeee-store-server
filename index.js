@@ -37,10 +37,10 @@ async function run() {
     // get operations for update coffee data
     app.get("/coffee/:id", async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)}
-      const result = await coffeeCollection.findOne(query)
-      res.send(result)
-    })
+      const query = { _id: new ObjectId(id) };
+      const result = await coffeeCollection.findOne(query);
+      res.send(result);
+    });
 
     // post data
     app.post("/coffee", async (req, res) => {
@@ -50,13 +50,34 @@ async function run() {
       res.send(result);
     });
 
+    // put operations for update specific data
+    app.put("/coffee/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updatedCoffee = req.body;
+      const coffee = {
+        $set: {
+          name: updatedCoffee.name,
+          quantity: updatedCoffee.quantity,
+          supplier: updatedCoffee.supplier,
+          taste: updatedCoffee.taste,
+          category: updatedCoffee.category,
+          details: updatedCoffee.details,
+          photo: updatedCoffee.photo,
+        },
+      };
+      const result = await coffeeCollection.updateOne(filter, coffee, options);
+      res.send(result);
+    });
+
     // delete operations
     app.delete("/coffee/:id", async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)}
-      const result = await coffeeCollection.deleteOne(query)
-      res.send(result)
-    })
+      const query = { _id: new ObjectId(id) };
+      const result = await coffeeCollection.deleteOne(query);
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
